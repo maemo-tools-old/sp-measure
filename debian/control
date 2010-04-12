@@ -1,0 +1,30 @@
+Source: sp-measure
+Priority: extra
+Maintainer: Kiryl Shutsemau <kiryl.shutsemau@nokia.com>
+Build-Depends: debhelper (>= 5), autotools-dev, doxygen, autoconf
+Standards-Version: 3.7.2
+Section: libs
+
+Package: libsp-measure-dev
+Section: libdevel
+Architecture: any
+Depends: libsp-measure1
+Description: The development files for libsp-measure library
+  Contains development headers and man pages for livbsp-measure library.
+
+Package: libsp-measure1
+Section: lib
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: System/process resource usage snapshot library.
+  Contains API for taking system/process resource usage snaphots and
+  calculating difference between two snapshots of the same type.
+
+
+Package: libsp-measure1-dbg
+Section: libdevel
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Debug symbols for libsp-measure1
+  Contains debug symbols for libsp-measure1 library used with tools
+  such as GDB

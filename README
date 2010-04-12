@@ -1,0 +1,7 @@
+sp-measure library provides API to make and compare snapshots of
+various system and process resources.
+
+This API can be used to gather system/process resource usage statistics - 
+for example cpu usage, free memory, process memory usage etc.
+
+See an example of API usage in examples/ directory.
