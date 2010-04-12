@@ -24,7 +24,7 @@ Description: System/process resource usage snapshot library.
 Package: libsp-measure1-dbg
 Section: libdevel
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: libsp-measure1 (= ${binary:Version})
 Description: Debug symbols for libsp-measure1
   Contains debug symbols for libsp-measure1 library used with tools
   such as GDB
