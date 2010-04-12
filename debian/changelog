@@ -1,5 +1,5 @@
 sp-measure (1.0) unstable; urgency=low
 
-  * Initial Release.
+  * Initial Release. Fixes: NB#161732
 
- -- Kiryl Shutsemau <kiryl.shutsemau@nokia.com>  Thu, 18 Mar 2010 09:50:07 +0200
+ -- Kiryl Shutsemau <kiryl.shutsemau@nokia.com>  Mon, 12 Apr 2010 09:50:07 +0200
