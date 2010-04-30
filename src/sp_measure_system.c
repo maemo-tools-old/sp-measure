@@ -196,8 +196,13 @@ static int sys_init_memory_data(
 		{ "MemTotal",  &data->common->mem_total, false },
 		{ "SwapTotal", &data->common->mem_swap, false },
 	};
+
 	if (file_parse_proc_meminfo(query, sizeof(query)/sizeof(query[0]))
 			!= sizeof(query)/sizeof(query[0])) {
+		int i;
+		for (i = 0; i < sizeof(query)/sizeof(query[0]); i++) {
+			*query[i].value = -1;
+		}
 		return -1;
 	}
 	return 0;
@@ -215,7 +220,11 @@ static int sys_init_cpu_data(
 		sp_measure_sys_data_t* data
 		)
 {
-	return file_read_int("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", &data->common->cpu_max_freq);
+	int rc = file_read_int("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", &data->common->cpu_max_freq);
+	if (rc) {
+		data->common->cpu_max_freq = -1;
+	}
+	return rc;
 }
 
 
@@ -254,6 +263,8 @@ static int sys_get_cpu_ticks_total(
 		fclose(fp);
 		return 0;
 	}
+	stats->cpu_ticks_total = -1;
+	stats->cpu_ticks_idle = -1;
 	return -1;
 }
 
@@ -290,26 +301,25 @@ static int sys_get_cpu_ticks_per_freq(
  */
 int sp_measure_init_sys_data(
 		sp_measure_sys_data_t* new_data,
-		int groups,
+		int resources,
 		const sp_measure_sys_data_t* sample_data
 		)
 {
+	int rc = 0;
 	memset(new_data, 0, sizeof(sp_measure_sys_data_t));
 	if (sample_data) {
 		new_data->common = sample_data->common;
 		new_data->common->ref_count++;
 	}
 	else {
-		int rc;
 		new_data->common = (sp_measure_sys_common_t*)malloc(sizeof(sp_measure_sys_common_t));
 		if (new_data->common == NULL) return -ENOMEM;
 		memset(new_data->common, 0, sizeof(sp_measure_sys_common_t));
-		new_data->common->groups = groups;
 		new_data->common->ref_count = 1;
-		if ( (rc = sys_init_memory_data(new_data)) != 0 ) return rc;
-		if ( (rc = sys_init_cpu_data(new_data)) != 0 ) return rc;
+		if ( (resources & SNAPSHOT_SYS_MEM_TOTALS) && sys_init_memory_data(new_data) != 0) rc |= SNAPSHOT_SYS_MEM_TOTALS;
+		if ( (resources & SNAPSHOT_SYS_CPU_MAX_FREQ) && sys_init_cpu_data(new_data) != 0) rc |= SNAPSHOT_SYS_CPU_MAX_FREQ;
 	}
-	return 0;
+	return rc;
 }
 
 int sp_measure_free_sys_data(
@@ -326,22 +336,22 @@ int sp_measure_free_sys_data(
 
 int sp_measure_get_sys_data(
 		sp_measure_sys_data_t* data,
+		int resources,
 		const char* name
 		)
 {
-	int rc;
-	int groups = data->common->groups;
+	int rc = 0;
 	if (name) {
 		if (data->name) free(data->name);
 		data->name = strdup(name);
 		if (data->name == NULL) return -ENOMEM;
 	}
-	if (groups & SNAPSHOT_TIMESTAMP) {
+	if (resources & SNAPSHOT_SYS_TIMESTAMP) {
 		struct timeval tv;
 		if ( (rc = gettimeofday(&tv, NULL)) != 0) return rc;
 		data->timestamp = tv.tv_sec % (60 * 60 * 24) * 1000 + tv.tv_usec / 1000;
 	}
-	if (groups & SNAPSHOT_MEMORY) {
+	if (resources & SNAPSHOT_SYS_MEM_USAGE) {
 		parse_query_t query[] = {
 			{ "MemFree",  &data->mem_free, false },
 			{ "Buffers", &data->mem_buffers, false },
@@ -349,20 +359,23 @@ int sp_measure_get_sys_data(
 		};
 		if (file_parse_proc_meminfo(query, sizeof(query)/sizeof(query[0]))
 				!= sizeof(query)/sizeof(query[0])) {
-			return -1;
+			int i;
+			for (i = 0; i < sizeof(query)/sizeof(query[0]); i++) {
+				*query[i].value = -1;
+			}
+			rc |= SNAPSHOT_SYS_MEM_USAGE;
 		}
 	}
-	if (groups & SNAPSHOT_WATERMARK) {
-		int low, high;
-		if ( (rc = file_read_int("/sys/kernel/low_watermark", &low)) != 0) return rc;
-		if ( (rc = file_read_int("/sys/kernel/high_watermark", &high)) != 0) return rc;
+	if (resources & SNAPSHOT_SYS_MEM_WATERMARK) {
+		int low = 0, high = 0;
+		if (file_read_int("/sys/kernel/low_watermark", &low) != 0) rc |= SNAPSHOT_SYS_MEM_WATERMARK;
+		if (file_read_int("/sys/kernel/high_watermark", &high) != 0) rc |= SNAPSHOT_SYS_MEM_WATERMARK;
 		data->mem_watermark = low | (high << 1);
 	}
-	if (groups & SNAPSHOT_CPU) {
-		if ( (rc = sys_get_cpu_ticks_total(data) != 0) ) return rc;
-		if ( (rc = sys_get_cpu_ticks_per_freq(data) != 0) ) return rc;
-	}
-	return 0;
+	if ( (resources & SNAPSHOT_SYS_CPU_USAGE) && sys_get_cpu_ticks_total(data) != 0) rc |= SNAPSHOT_SYS_CPU_USAGE;
+	if ( (resources & SNAPSHOT_SYS_CPU_FREQ) && sys_get_cpu_ticks_per_freq(data) != 0) rc |= SNAPSHOT_SYS_CPU_FREQ;
+
+	return rc;
 }
 
 
@@ -395,6 +408,9 @@ int sp_measure_diff_sys_cpu_ticks(
 	if (data1->common != data2->common) {
 		return -EINVAL;
 	}
+	if (data2->cpu_ticks_total == -1 || data1->cpu_ticks_total == -1) {
+		return -EINVAL;
+	}
 	*diff = data2->cpu_ticks_total - data1->cpu_ticks_total;
 	return 0;
 }
@@ -406,6 +422,10 @@ int sp_measure_diff_sys_cpu_usage(
 		)
 {
 	if (data1->common != data2->common) {
+		return -EINVAL;
+	}
+	if (data2->cpu_ticks_total == -1 || data1->cpu_ticks_total == -1 ||
+			data2->cpu_ticks_idle == -1 || data1->cpu_ticks_idle == -1) {
 		return -EINVAL;
 	}
 	int total_ticks_diff = data2->cpu_ticks_total - data1->cpu_ticks_total;
@@ -433,6 +453,9 @@ int sp_measure_diff_sys_mem_used(
 		)
 {
 	if (data1->common != data2->common) {
+		return -EINVAL;
+	}
+	if (data1->common->mem_total == -1 || data1->mem_free == -1 || data2->mem_free == -1) {
 		return -EINVAL;
 	}
 	*diff = FIELD_SYS_MEM_USED(data2) - FIELD_SYS_MEM_USED(data1);

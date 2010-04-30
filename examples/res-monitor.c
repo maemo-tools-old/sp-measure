@@ -59,29 +59,29 @@ int main(int argc, char* argv[])
 	sp_measure_proc_data_t* proc_data2 = &proc_data[1];
 
 	/* initialize system snapshots */
-	if (sp_measure_init_sys_data(sys_data1, SNAPSHOT_ALL & (~SNAPSHOT_WATERMARK), NULL) != 0) {
+	if (sp_measure_init_sys_data(sys_data1, SNAPSHOT_SYS, NULL) < 0) {
 		fprintf(stderr, "Failed to initialize first system snapshot\n");
 	}
-	if (sp_measure_init_sys_data(sys_data2, 0,  sys_data1) != 0) {
+	if (sp_measure_init_sys_data(sys_data2, 0,  sys_data1) < 0) {
 		fprintf(stderr, "Failed to initialize second system snapshot\n");
 	}
 
 	/* Initialize process snapshots if necessary */
 	if (monitored_process) {
-		if (sp_measure_init_proc_data(proc_data1, monitored_process, SNAPSHOT_ALL, NULL) != 0) {
+		if (sp_measure_init_proc_data(proc_data1, monitored_process, SNAPSHOT_PROC, NULL) < 0) {
 			fprintf(stderr, "Failed to initialize first process snapshot\n");
 		}
-		if (sp_measure_init_proc_data(proc_data2, 0, 0, proc_data1) != 0) {
+		if (sp_measure_init_proc_data(proc_data2, 0, 0, proc_data1) < 0) {
 			fprintf(stderr, "Failed to initialize second process snapshot\n");
 		}
 	}
 
 	/* get the initial system snapshot */
-	if (sp_measure_get_sys_data(sys_data1, NULL) != 0) {
+	if (sp_measure_get_sys_data(sys_data1, SNAPSHOT_SYS, NULL) < 0) {
 		fprintf(stderr, "Failed to get system snapshot\n");
 	}
 	/* get the initial process snapshot if necessary */
-	if (monitored_process && sp_measure_get_proc_data(proc_data1, NULL) != 0) {
+	if (monitored_process && sp_measure_get_proc_data(proc_data1, SNAPSHOT_PROC, NULL) < 0) {
 		fprintf(stderr, "Failed to get process snapshot\n");
 	}
 
@@ -101,7 +101,7 @@ int main(int argc, char* argv[])
 	while (1) {
 		int sys_mem_change, sys_cpu_usage, sys_cpu_avg_freq;
 		/* get the next system snapshot */
-		if (sp_measure_get_sys_data(sys_data2, NULL) != 0) {
+		if (sp_measure_get_sys_data(sys_data2, SNAPSHOT_SYS, NULL) < 0) {
 			fprintf(stderr, "Failed to get system snapshot\n");
 		}
 		/* calculate and print resource usage differences from the previous system snapshot */
@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 		if (monitored_process) {
 			int sys_cpu_ticks, proc_cpu_ticks, proc_mem_change;
 			/* get the next process snapshot */
-			if (sp_measure_get_proc_data(proc_data2, NULL) != 0) {
+			if (sp_measure_get_proc_data(proc_data2, SNAPSHOT_PROC, NULL) < 0) {
 				fprintf(stderr, "Failed to get process snapshot\n");
 				exit(-1);
 			}

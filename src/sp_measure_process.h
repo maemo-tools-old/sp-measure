@@ -35,7 +35,7 @@
  *    // declare snapshot data structures
  *    sp_measure_proc_data_t data1, data2;
  *    // initialize the first snapshot structure for process with pid 1234
- *    sp_measure_init_proc_data(&data1, 1234, SNAPSHOT_ALL, NULL);
+ *    sp_measure_init_proc_data(&data1, 1234, SNAPSHOT_PROC, NULL);
  *    // initialize the second snapshot structure
  *    sp_measure_init_proc_data(&data2, 0, 0, &data2);
  *    // take first snapshot
@@ -66,10 +66,6 @@ extern "C" {
  * Common process information.
  */
 typedef struct sp_measure_proc_common_t {
-	/* flag specifying which process resource groups are included in
-	 * the snapshot. See sp_measure_data_groups_t enumeration. */
-	int groups;
-
 	/* pid */
 	int pid;
 	/* the process name */
@@ -124,15 +120,22 @@ typedef struct sp_measure_proc_data_t {
  * sp_measure_free_proc_data() function.
  * @param[out] new_data    the process snapshot data structure to initialize.
  * @param[in] pid          the process id (ignored if sample_data is given).
- * @param[in] groups       a flag specifying which data groups should be retrieved
- *                         (ignored if sample_data is given).
+ * @param[in] resources    a flag specifying which initial process resource
+ *                         statistics should be retrieved (ignored if
+ *                         sample_data is given).
  * @param[in] sample_data  An already initialized process snapshot.
- * @return            0 for success.
+ * @return                 0  - success
+ *                         >0 - only part of the initial process resource statistics
+ *                              was retrieved. The returned value consists of the failed
+ *                              resource identifiers (see sp_measure_proc_resource_t
+ *                              enumeration).
+ *                         <0 - unrecoverable error during process resource statistics
+ *                              retrieval. For example process does not exist.
  */
 int sp_measure_init_proc_data(
 		sp_measure_proc_data_t* new_data,
 		int pid,
-		int groups,
+		int resources,
 		const sp_measure_proc_data_t* sample_data
 		);
 
@@ -165,12 +168,21 @@ int sp_measure_free_proc_data(
  *
  * The data data structure must be initialized by sp_measure_init_proc_data() or
  * sp_measure_init_cloned_proc_data() functions.
- * @param[out] data   the process statistics data structure.
- * @param[in] name     the snapshot name (optional). Can be NULL if snapshot naming is not required.
- * @return             0 for success.
+ * @param[out] data      the process statistics data structure.
+ * @param[in] resources  a flag specifying which process resource statistics
+ *                       should be retrieved
+ * @param[in] name       the snapshot name (optional). Can be NULL if snapshot naming
+ *                       is not required.
+ * @return               0  - success
+ *                       >0 - only part of the process resource statistics was retrieved.
+ *                            The returned value consists of the failed resource
+ *                            identifiers (see sp_measure_proc_resource_t enumeration).
+ *                       <0 - unrecoverable error during process resource statistics
+ *                            retrieval.
  */
 int sp_measure_get_proc_data(
 		sp_measure_proc_data_t* data,
+		int resources,
 		const char* name
 		);
 

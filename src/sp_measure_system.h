@@ -34,7 +34,7 @@
  *    // declare snapshot data structures
  *    sp_measure_sys_data_t data1, data2;
  *    // initialize the first snapshot structure
- *    sp_measure_init_sys_data(&data1, SNAPSHOT_ALL, NULL);
+ *    sp_measure_init_sys_data(&data1, SNAPSHOT_SYS, NULL);
  *    // initialize the second snapshot structure
  *    sp_measure_init_sys_data(&data2, 0, &data2);
  *    // take first snapshot
@@ -70,10 +70,6 @@ extern "C" {
  * Common system information.
  */
 typedef struct sp_measure_sys_common_t {
-	/* flag specifying which system resource groups are included in
-	 * the snapshot. See sp_measure_data_groups_t enumeration. */
-	int groups;
-
 	/* the total system memory */
 	int mem_total;
 	/* the total swap memory */
@@ -145,14 +141,20 @@ typedef struct sp_measure_sys_data_t {
  * Afterwards the internal data structure data must be freed with
  * sp_measure_free_sys_data() function.
  * @param[out] new_data    the system snapshot data structure to initialize.
- * @param[in] groups       a flag specifying which data groups should be retrieved
- *                         (ignored if sample_data is given).
+ * @param[in] resources    a flag specifying which system parameters should be
+ *                         retrieved (ignored if sample_data is given).
  * @param[in] sample_data  An already initialized system snapshot.
- * @return            0 for success.
+ * @return                 0  - success
+ *                         >0 - only a part of the 'global' system parameters
+ *                              was retrieved. The returned value consists of the failed
+ *                              resource identifiers (see sp_measure_sys_resource_t
+ *                              enumeration).
+ *                         <0 - unrecoverable error during system parameter retrieval.
+ *
  */
 int sp_measure_init_sys_data(
 		sp_measure_sys_data_t* new_data,
-		int groups,
+		int resources,
 		const sp_measure_sys_data_t* sample_data
 		);
 
@@ -174,12 +176,18 @@ int sp_measure_free_sys_data(
  * Takes system resource usage snapshot.
  *
  * The data structure must be initialized by sp_measure_init_sys_data() function.
- * @param[out] data    the system resource usage snapshot.
- * @param[in] name     the snapshot name (optional). Can be NULL.
- * @return             0 for success.
+ * @param[out] data      the system resource usage snapshot.
+ * @param[in] resources  a flag specifying resources which usage statistics should be retrieved.
+ * @param[in] name       the snapshot name (optional). Can be NULL.
+ * @return               0  - success
+ *                       >0 - only a part of the system resource usage statistics was retrieved.
+ *                            The returned value consists of the failed resource identifiers
+ *                            (see sp_measure_sys_resource_t enumeration).
+ *                       <0 - unrecoverable error during resource usage statistics retrieval.
  */
 int sp_measure_get_sys_data(
 		sp_measure_sys_data_t* data,
+		int resources,
 		const char* name
 		);
 

@@ -50,24 +50,24 @@ static int file_parse_proc_smaps(
 		sp_measure_proc_data_t* data
 		)
 {
+	char buffer[128], key[128];
+	int value, i;
+	parse_query_t query[] = {
+			{"Private_Clean", &data->mem_private_clean, false},
+			{"Private_Dirty", &data->mem_private_dirty, false},
+			{"Swap", &data->mem_swap, false},
+			{"Shared_Clean", &data->mem_shared_clean, false},
+			{"Shared_Dirty", &data->mem_shared_dirty, false},
+			{"Size", &data->mem_size, false},
+			{"Pss", &data->mem_pss, false},
+			{"Rss", &data->mem_rss, false},
+			{"Referenced", &data->mem_referenced, false},
+		};
+	for (i = 0; i < sizeof(query) / sizeof(query[0]); i++) {
+		*(query[i].value) = 0;
+	}
 	FILE* fp = fopen(data->common->proc_smaps_path, "r");
 	if (fp) {
-		char buffer[128], key[128];
-		int value, i;
-		parse_query_t query[] = {
-				{"Private_Clean", &data->mem_private_clean, false},
-				{"Private_Dirty", &data->mem_private_dirty, false},
-				{"Swap", &data->mem_swap, false},
-				{"Shared_Clean", &data->mem_shared_clean, false},
-				{"Shared_Dirty", &data->mem_shared_dirty, false},
-				{"Size", &data->mem_size, false},
-				{"Pss", &data->mem_pss, false},
-				{"Rss", &data->mem_rss, false},
-				{"Referenced", &data->mem_referenced, false},
-			};
-		for (i = 0; i < sizeof(query) / sizeof(query[0]); i++) {
-			*(query[i].value) = 0;
-		}
 		while (fgets(buffer, sizeof(buffer), fp)) {
 			if (sscanf(buffer, "%[^:]: %d", key, &value) == 2) {
 				for (i = 0; i < sizeof(query) / sizeof(query[0]); i++) {
@@ -80,6 +80,9 @@ static int file_parse_proc_smaps(
 		}
 		fclose(fp);
 		return 0;
+	}
+	for (i = 0; i < sizeof(query) / sizeof(query[0]); i++) {
+		*(query[i].value) = -1;
 	}
 	return -1;
 }
@@ -124,6 +127,10 @@ static int file_parse_proc_stat(
 			}
 		}
 		close(fd);
+	}
+	if (rc) {
+		data->cpu_utime = -1;
+		data->cpu_stime = -1;
 	}
 	return rc;
 }
@@ -189,7 +196,7 @@ char* get_process_name(int pid)
 int sp_measure_init_proc_data(
 		sp_measure_proc_data_t* new_data,
 		int pid,
-		int groups,
+		int resources,
 		const sp_measure_proc_data_t* sample_data		)
 {
 	memset(new_data, 0, sizeof(sp_measure_proc_data_t));
@@ -205,7 +212,6 @@ int sp_measure_init_proc_data(
 
 		new_data->common->pid = pid;
 		new_data->common->ref_count = 1;
-		new_data->common->groups = groups;
 
 		/* open data files */
 		sprintf(buffer, "%s/proc/%d/smaps", sp_measure_virtual_fs_root, pid);
@@ -250,23 +256,24 @@ int sp_measure_free_proc_data(
 
 int sp_measure_get_proc_data(
 		sp_measure_proc_data_t* data,
+		int resources,
 		const char* name
 		)
 {
-	int rc;
-	int groups = data->common->groups;
+	int rc = 0;
+	/* first check if the process still exists */
+	if (access(data->common->proc_stat_path, F_OK) != 0) {
+		return -1;
+	}
 	if (name) {
 		if (data->name) free(data->name);
 		data->name = strdup(name);
 		if (data->name == NULL) return -ENOMEM;
 	}
-	if (groups & SNAPSHOT_MEMORY) {
-		if ( (rc = file_parse_proc_smaps(data)) != 0) return rc;
-	}
-	if (groups & SNAPSHOT_CPU) {
-		if ( (rc = file_parse_proc_stat(data)) != 0) return rc;
-	}
-	return 0;
+	if ( (resources & SNAPSHOT_PROC_MEM_USAGE) && file_parse_proc_smaps(data) != 0) rc |= SNAPSHOT_PROC_MEM_USAGE;
+	if ( (resources & SNAPSHOT_PROC_CPU_USAGE) && file_parse_proc_stat(data) != 0) rc |= SNAPSHOT_PROC_CPU_USAGE;
+
+	return rc;
 }
 
 
@@ -283,6 +290,11 @@ int sp_measure_diff_proc_mem_private_dirty(
 	if (data1->common != data2->common) {
 		return -EINVAL;
 	}
+	if (data1->mem_private_dirty == -1 || data2->mem_private_dirty == -1) {
+		/* either both memory data (private_dirty and mem_swap) are retrieved
+		 * or none at all. So its enough to check only one for invalid value  */
+		return -EINVAL;
+	}
 	*diff = (data2->mem_private_dirty + data2->mem_swap) - (data1->mem_private_dirty + data1->mem_swap);
 	return 0;
 }
@@ -295,6 +307,11 @@ int sp_measure_diff_proc_cpu_ticks(
 		)
 {
 	if (data1->common != data2->common) {
+		return -EINVAL;
+	}
+	if (data1->cpu_stime == -1 || data2->cpu_stime == -1) {
+		/* either cpu statistics (stime and utime) are retrieved or none
+		 * or none at all. So its enough to check only one for invalid value  */
 		return -EINVAL;
 	}
 	*diff = (data2->cpu_stime + data2->cpu_utime) - (data1->cpu_stime + data1->cpu_utime);

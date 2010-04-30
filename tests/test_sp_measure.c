@@ -52,7 +52,7 @@ void check_system_api()
 	sp_measure_set_fs_root("./rootfs1");
 
 	/* initialize data1, data2 snapshot structures */
-	TEST(sp_measure_init_sys_data(&data1, SNAPSHOT_ALL, NULL) == 0);
+	TEST(sp_measure_init_sys_data(&data1, SNAPSHOT_SYS, NULL) == 0);
 	TEST(sp_measure_init_sys_data(&data2, 0, &data1) == 0);
 	TEST(data1.common != NULL);
 	TEST(data1.common == data2.common);
@@ -63,7 +63,7 @@ void check_system_api()
 	TEST_VALUE_INT(data1.common->cpu_max_freq, 2201000);
 
 	/* take system resource usage snapshot */
-	TEST(sp_measure_get_sys_data(&data1, "snapshot1") == 0);
+	TEST(sp_measure_get_sys_data(&data1, SNAPSHOT_SYS, "snapshot1") == 0);
 	TEST_VALUE_STR(data1.name, "snapshot1");
 
 	/* check memory usage data */
@@ -80,11 +80,11 @@ void check_system_api()
 	/* set the fake rootfs */
 	sp_measure_set_fs_root("./rootfs2");
 	/* take the second snapshot */
-	TEST(sp_measure_get_sys_data(&data2, NULL) == 0);
+	TEST(sp_measure_get_sys_data(&data2, SNAPSHOT_SYS, NULL) == 0);
 	TEST(data2.name == NULL);
 	/* take third snapshot */
-	TEST(sp_measure_init_sys_data(&data3, SNAPSHOT_ALL, NULL) == 0);
-	TEST(sp_measure_get_sys_data(&data3, NULL) == 0);
+	TEST(sp_measure_init_sys_data(&data3, SNAPSHOT_SYS, NULL) == 0);
+	TEST(sp_measure_get_sys_data(&data3, SNAPSHOT_SYS, NULL) == 0);
 
 	/* check memory usage data */
 	TEST_VALUE_INT(data2.mem_free, 426176);
@@ -137,7 +137,7 @@ void check_process_api()
 	/* set the fake rootfs */
 	sp_measure_set_fs_root("./rootfs1");
 	/* initialize data1, data2 snapshot structures */
-	TEST(sp_measure_init_proc_data(&data1, 25268, SNAPSHOT_ALL, NULL) == 0);
+	TEST(sp_measure_init_proc_data(&data1, 25268, SNAPSHOT_PROC, NULL) == 0);
 	TEST(sp_measure_init_proc_data(&data2, 25268, 0, &data1) == 0);
 	TEST(data1.common != NULL);
 	TEST(data1.common == data2.common);
@@ -147,7 +147,7 @@ void check_process_api()
 	TEST_VALUE_INT(FIELD_PROC_PID(&data1), 25268);
 
 	/* take process snapshot */
-	TEST(sp_measure_get_proc_data(&data1, "snapshot1") == 0);
+	TEST(sp_measure_get_proc_data(&data1, SNAPSHOT_PROC, "snapshot1") == 0);
 	TEST_VALUE_STR(data1.name, "snapshot1");
 
 	/* check memory usage data */
@@ -169,9 +169,9 @@ void check_process_api()
 	/* set the fake roorfs */
 	sp_measure_set_fs_root("./rootfs2");
 	/* initialize and take third snapshot */
-	TEST(sp_measure_init_proc_data(&data3, 25268, SNAPSHOT_ALL, NULL) == 0);
+	TEST(sp_measure_init_proc_data(&data3, 25268, SNAPSHOT_PROC, NULL) == 0);
 	TEST(data3.common != NULL);
-	TEST(sp_measure_get_proc_data(&data3, NULL) == 0);
+	TEST(sp_measure_get_proc_data(&data3, SNAPSHOT_PROC, NULL) == 0);
 	TEST(data3.name == NULL);
 
 	/* check memory usage data */
