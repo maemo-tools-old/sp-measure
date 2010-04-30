@@ -31,7 +31,7 @@
  * 1) example in source package
  *    gcc -I../src -L../src/.libs res-monitor.c -lspmeasure -o res-monitor
  * 2) example installed with libsp-measure-dev
- *    gcc res-monitor.c -lspmeasure -o res-monitor
+ *    gcc -O -Wall res-monitor.c -lspmeasure -o res-monitor
  *
  * run:
  *    LD_LIBRARY_PATH=../src/.libs ./res-monitor [<pid>]
