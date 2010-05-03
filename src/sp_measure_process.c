@@ -82,7 +82,7 @@ static int file_parse_proc_smaps(
 		return 0;
 	}
 	for (i = 0; i < sizeof(query) / sizeof(query[0]); i++) {
-		*(query[i].value) = -1;
+		*(query[i].value) = ESPMEASURE_UNDEFINED;
 	}
 	return -1;
 }
@@ -129,8 +129,8 @@ static int file_parse_proc_stat(
 		close(fd);
 	}
 	if (rc) {
-		data->cpu_utime = -1;
-		data->cpu_stime = -1;
+		data->cpu_utime = ESPMEASURE_UNDEFINED;
+		data->cpu_stime = ESPMEASURE_UNDEFINED;
 	}
 	return rc;
 }
@@ -290,7 +290,7 @@ int sp_measure_diff_proc_mem_private_dirty(
 	if (data1->common != data2->common) {
 		return -EINVAL;
 	}
-	if (data1->mem_private_dirty == -1 || data2->mem_private_dirty == -1) {
+	if (data1->mem_private_dirty == ESPMEASURE_UNDEFINED || data2->mem_private_dirty == ESPMEASURE_UNDEFINED) {
 		/* either both memory data (private_dirty and mem_swap) are retrieved
 		 * or none at all. So its enough to check only one for invalid value  */
 		return -EINVAL;
@@ -309,7 +309,7 @@ int sp_measure_diff_proc_cpu_ticks(
 	if (data1->common != data2->common) {
 		return -EINVAL;
 	}
-	if (data1->cpu_stime == -1 || data2->cpu_stime == -1) {
+	if (data1->cpu_stime == ESPMEASURE_UNDEFINED || data2->cpu_stime == ESPMEASURE_UNDEFINED) {
 		/* either cpu statistics (stime and utime) are retrieved or none
 		 * or none at all. So its enough to check only one for invalid value  */
 		return -EINVAL;

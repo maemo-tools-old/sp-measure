@@ -201,7 +201,7 @@ static int sys_init_memory_data(
 			!= sizeof(query)/sizeof(query[0])) {
 		int i;
 		for (i = 0; i < sizeof(query)/sizeof(query[0]); i++) {
-			*query[i].value = -1;
+			*query[i].value = ESPMEASURE_UNDEFINED;
 		}
 		return -1;
 	}
@@ -222,7 +222,7 @@ static int sys_init_cpu_data(
 {
 	int rc = file_read_int("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", &data->common->cpu_max_freq);
 	if (rc) {
-		data->common->cpu_max_freq = -1;
+		data->common->cpu_max_freq = ESPMEASURE_UNDEFINED;
 	}
 	return rc;
 }
@@ -263,8 +263,8 @@ static int sys_get_cpu_ticks_total(
 		fclose(fp);
 		return 0;
 	}
-	stats->cpu_ticks_total = -1;
-	stats->cpu_ticks_idle = -1;
+	stats->cpu_ticks_total = ESPMEASURE_UNDEFINED;
+	stats->cpu_ticks_idle = ESPMEASURE_UNDEFINED;
 	return -1;
 }
 
@@ -363,7 +363,7 @@ int sp_measure_get_sys_data(
 				!= sizeof(query)/sizeof(query[0])) {
 			int i;
 			for (i = 0; i < sizeof(query)/sizeof(query[0]); i++) {
-				*query[i].value = -1;
+				*query[i].value = ESPMEASURE_UNDEFINED;
 			}
 			rc |= SNAPSHOT_SYS_MEM_USAGE;
 		}
@@ -410,7 +410,7 @@ int sp_measure_diff_sys_cpu_ticks(
 	if (data1->common != data2->common) {
 		return -EINVAL;
 	}
-	if (data2->cpu_ticks_total == -1 || data1->cpu_ticks_total == -1) {
+	if (data2->cpu_ticks_total == ESPMEASURE_UNDEFINED || data1->cpu_ticks_total == ESPMEASURE_UNDEFINED) {
 		return -EINVAL;
 	}
 	*diff = data2->cpu_ticks_total - data1->cpu_ticks_total;
@@ -426,8 +426,8 @@ int sp_measure_diff_sys_cpu_usage(
 	if (data1->common != data2->common) {
 		return -EINVAL;
 	}
-	if (data2->cpu_ticks_total == -1 || data1->cpu_ticks_total == -1 ||
-			data2->cpu_ticks_idle == -1 || data1->cpu_ticks_idle == -1) {
+	if (data2->cpu_ticks_total == ESPMEASURE_UNDEFINED || data1->cpu_ticks_total == ESPMEASURE_UNDEFINED ||
+			data2->cpu_ticks_idle == ESPMEASURE_UNDEFINED || data1->cpu_ticks_idle == ESPMEASURE_UNDEFINED) {
 		return -EINVAL;
 	}
 	int total_ticks_diff = data2->cpu_ticks_total - data1->cpu_ticks_total;
@@ -457,7 +457,8 @@ int sp_measure_diff_sys_mem_used(
 	if (data1->common != data2->common) {
 		return -EINVAL;
 	}
-	if (data1->common->mem_total == -1 || data1->mem_free == -1 || data2->mem_free == -1) {
+	if (data1->common->mem_total == ESPMEASURE_UNDEFINED || data1->mem_free == ESPMEASURE_UNDEFINED ||
+			data2->mem_free == ESPMEASURE_UNDEFINED) {
 		return -EINVAL;
 	}
 	*diff = FIELD_SYS_MEM_USED(data2) - FIELD_SYS_MEM_USED(data1);

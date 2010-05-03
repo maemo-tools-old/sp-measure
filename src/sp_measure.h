@@ -62,6 +62,8 @@ typedef enum {
 	MEM_WATERMARK_HIGH   = 1 << 1
 } sp_measure_mem_watermark_t;
 
+#define ESPMEASURE_UNDEFINED		(-1)
+
 #include <sp_measure_system.h>
 #include <sp_measure_process.h>
 
