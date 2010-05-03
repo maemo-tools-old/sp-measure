@@ -356,6 +356,8 @@ int sp_measure_get_sys_data(
 			{ "MemFree",  &data->mem_free, false },
 			{ "Buffers", &data->mem_buffers, false },
 			{ "Cached", &data->mem_cached, false },
+			{ "SwapCached", &data->mem_swap_cached, false },
+			{ "SwapFree", &data->mem_swap_free, false },
 		};
 		if (file_parse_proc_meminfo(query, sizeof(query)/sizeof(query[0]))
 				!= sizeof(query)/sizeof(query[0])) {

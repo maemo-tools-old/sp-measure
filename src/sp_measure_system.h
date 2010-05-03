@@ -116,6 +116,11 @@ typedef struct sp_measure_sys_data_t {
 	/* memory used for caching */
 	int mem_cached;
 
+	/* unused swap memory */
+	int mem_swap_free;
+	/* swap memory used for caching */
+	int mem_swap_cached;
+
 	/* Maemo5 specific memory watermarks,
 	 * see sp_measure_mem_watermark_t enumeration */
 	int mem_watermark;
@@ -282,7 +287,9 @@ int sp_measure_diff_sys_mem_used(
 /*
  * Field access definitions
  */
-#define FIELD_SYS_MEM_USED(data)             ((data)->common->mem_total - (data)->mem_free - (data)->mem_cached - (data)->mem_buffers)
+#define FIELD_SYS_MEM_USED(data)             ((data)->common->mem_total + (data)->common->mem_swap -\
+                                             (data)->mem_free - (data)->mem_cached - (data)->mem_buffers -\
+                                             (data)->mem_swap_free - (data)->mem_swap_cached)
 #define FIELD_SYS_MEM_TOTAL(data)            (data)->common->mem_total
 #define FIELD_SYS_MEM_SWAP(data)             (data)->common->mem_swap
 #define FIELD_SYS_MEM_WATERMARK(data)        (data)->mem_watermark
