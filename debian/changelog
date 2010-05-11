@@ -1,3 +1,9 @@
+sp-memusage (1.1.1) unstable; urgency=low
+
+  * use LGPL as license.  Fixes: NB#168424
+
+ -- Kiryl Shutsemau <kiryl.shutsemau@nokia.com>  Tue, 11 May 2010 17:11:40 +0200
+
 sp-measure (1.1) unstable; urgency=low
 
   * API change, allow retrieving of part of the data to fail and retrieving
