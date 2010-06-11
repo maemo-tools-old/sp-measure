@@ -1,4 +1,4 @@
-sp-memusage (1.1.1) unstable; urgency=low
+sp-measure (1.1.1) unstable; urgency=low
 
   * use LGPL as license.  Fixes: NB#168424
 
