@@ -22,7 +22,7 @@ export VERSION_MAJOR=1
 export VERSION_MINOR=0
 
 configure:
-	autoreconf -fvi
+	autoreconf -f -v -i
 
 config-status: configure
 	dh_testdir
