@@ -249,7 +249,7 @@ int sp_measure_diff_proc_cpu_ticks(
 #define FIELD_PROC_CPU_UTIME(data)           (data)->cpu_utime
 
 #ifdef __cplusplus
-extern "C" }
+}
 #endif
 
 #endif
