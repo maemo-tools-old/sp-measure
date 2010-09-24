@@ -13,7 +13,7 @@ Description: The development files for libsp-measure library
  Contains development headers and man pages for libsp-measure library.
 
 Package: libsp-measure1
-Section: lib
+Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}
 Description: System/process resource usage snapshot library.
