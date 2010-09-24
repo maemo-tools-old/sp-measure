@@ -1,7 +1,7 @@
 Source: sp-measure
 Priority: extra
 Maintainer: Kiryl Shutsemau <kiryl.shutsemau@nokia.com>
-Build-Depends: debhelper (>= 5), autotools-dev, doxygen, autoconf
+Build-Depends: debhelper (>= 5), automake, doxygen
 Standards-Version: 3.9.1
 Section: libs
 
