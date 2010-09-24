@@ -10,21 +10,19 @@ Section: libdevel
 Architecture: any
 Depends: libsp-measure1
 Description: The development files for libsp-measure library
-  Contains development headers and man pages for libsp-measure library.
+ Contains development headers and man pages for libsp-measure library.
 
 Package: libsp-measure1
 Section: lib
 Architecture: any
 Depends: ${shlibs:Depends}
 Description: System/process resource usage snapshot library.
-  Contains API for taking system/process resource usage snaphots and
-  calculating difference between two snapshots of the same type.
-
+ Contains API for taking system/process resource usage snaphots and calculating
+ difference between two snapshots of the same type.
 
 Package: libsp-measure1-dbg
 Section: libdevel
 Architecture: any
 Depends: libsp-measure1 (= ${binary:Version})
 Description: Debug symbols for libsp-measure1
-  Contains debug symbols for libsp-measure1 library used with tools
-  such as GDB
+ Contains debug symbols for libsp-measure1 library used with tools such as GDB.
