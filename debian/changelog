@@ -1,3 +1,11 @@
+sp-measure (1.2) unstable; urgency=low
+
+  * Build-depend on automake. Fixes: NB#194297
+  * Fix sp_measure_process.h, so that it can be included in C++ code.
+    Fixes: NB#193614
+
+ -- Tommi Rantala <ext-tommi.1.rantala@nokia.com>  Fri, 24 Sep 2010 11:58:02 +0300
+
 sp-measure (1.1.1) unstable; urgency=low
 
   * use LGPL as license.  Fixes: NB#168424
