@@ -21,7 +21,7 @@ Description: System/process resource usage snapshot library.
  difference between two snapshots of the same type.
 
 Package: libsp-measure1-dbg
-Section: libdevel
+Section: debug
 Architecture: any
 Depends: ${misc:Depends}, libsp-measure1 (= ${binary:Version})
 Description: Debug symbols for libsp-measure1
