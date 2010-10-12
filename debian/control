@@ -1,6 +1,6 @@
 Source: sp-measure
 Priority: extra
-Maintainer: Kiryl Shutsemau <kiryl.shutsemau@nokia.com>
+Maintainer: Eero Tamminen <eero.tamminen@nokia.com>
 Build-Depends: debhelper (>= 5), automake, doxygen, libtool
 Standards-Version: 3.9.1
 Section: libs
