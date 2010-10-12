@@ -1,3 +1,9 @@
+sp-measure (1.2.1) unstable; urgency=low
+
+  * Packaging fixes.
+
+ -- Tommi Rantala <ext-tommi.1.rantala@nokia.com>  Tue, 12 Oct 2010 14:18:27 +0300
+
 sp-measure (1.2) unstable; urgency=low
 
   * Build-depend on automake. Fixes: NB#194297
