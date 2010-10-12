@@ -8,7 +8,7 @@ Section: libs
 Package: libsp-measure-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends}, libsp-measure1
+Depends: ${misc:Depends}, libsp-measure1 (= ${binary:Version})
 Description: The development files for libsp-measure library
  Contains development headers and man pages for libsp-measure library.
 
