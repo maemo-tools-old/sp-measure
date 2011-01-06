@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.13])
-AC_INIT([sp-measure], [0.1], [none])
+AC_INIT([sp-measure], [1.2], [none])
 
 AC_CONFIG_AUX_DIR([aux])
 
@@ -19,6 +19,9 @@ m4_defun([_LT_AC_LANG_F77_CONFIG], [:])
 
 AC_PROG_CC
 AC_PROG_LIBTOOL
+
+# set libtool versioning
+AC_SUBST(VERSION_INFO, $(echo -version-info $VERSION | sed s/\\./:/g))
 
 # Checks for libraries.
 
