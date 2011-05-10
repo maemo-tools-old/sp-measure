@@ -80,6 +80,9 @@ typedef struct sp_measure_sys_common_t {
 
 	/* system common data reference counter */
 	int ref_count;
+
+	/* root of the cgroups file system. */
+	char* cgroup_root;
 } sp_measure_sys_common_t;
 
 /**
@@ -121,6 +124,9 @@ typedef struct sp_measure_sys_data_t {
 	/* swap memory used for caching */
 	int mem_swap_cached;
 
+	/* contents of memory.memsw.usage_in_bytes for specified cgroup or root group */
+	int mem_cgroup;
+
 	/* Maemo5 specific memory watermarks,
 	 * see sp_measure_mem_watermark_t enumeration */
 	int mem_watermark;
@@ -135,6 +141,7 @@ typedef struct sp_measure_sys_data_t {
 	int cpu_freq_ticks_count;
 
 } sp_measure_sys_data_t;
+
 
 /**
  * Initializes system snapshot data structure.
@@ -176,6 +183,15 @@ int sp_measure_free_sys_data(
 		sp_measure_sys_data_t* data
 		);
 
+/**
+ * select cgroup based on its name.
+ *
+ * This functions scans /syspart folder contents to find proper cgroup by name.
+ * @param[in] data   the system snapshot data structure.
+ * @param[in] name   the system cgroup to be selected.
+ * @return           the full path of selected cgroup.
+ */
+const char* sp_measure_cgroup_select(sp_measure_sys_data_t* data, const char* name);
 
 /**
  * Takes system resource usage snapshot.
@@ -284,6 +300,21 @@ int sp_measure_diff_sys_mem_used(
 		);
 
 
+/**
+ * Retrieves system cgroup memory usage difference between two snapshots.
+ *
+ * @param[in] data1  the first snapshot.
+ * @param[in] data2  the second snapshot.
+ * @param[out] diff  the memory difference.
+ * @return           0 for success.
+ */
+int sp_measure_diff_sys_mem_cgroup(
+		const sp_measure_sys_data_t* data1,
+		const sp_measure_sys_data_t* data2,
+		int* diff
+		);
+
+
 /*
  * Field access definitions
  */
@@ -294,8 +325,9 @@ int sp_measure_diff_sys_mem_used(
 #define FIELD_SYS_MEM_SWAP(data)             (data)->common->mem_swap
 #define FIELD_SYS_MEM_WATERMARK(data)        (data)->mem_watermark
 #define FIELD_SYS_CPU_MAX_FREQ(data)         (data)->common->cpu_max_freq
-#define FIELD_SYS_CPU_TICKS(data)            (data)->cpu_total_ticks;
+#define FIELD_SYS_CPU_TICKS(data)            (data)->cpu_total_ticks
 #define FIELD_SYS_TIMESTAMP(data)            (data)->timestamp
+#define FIELD_SYS_MEM_CGROUP(data)           (data)->mem_cgroup
 
 #ifdef __cplusplus
 }

@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <ftw.h>
 
 #include "sp_measure.h"
 #include "measure_utils.h"
@@ -181,6 +182,35 @@ static int file_read_int(
 }
 
 /**
+ * Reads single int value from a cgroup file with conversion to kbytes.
+ *
+ * @param filename[in]   the file to read.
+ * @param value[out]     the read value.
+ * @return               0 for success.
+ */
+static int cgroup_read_int(
+		sp_measure_sys_data_t* data,
+		const char* filename
+		)
+{
+	if (data->common->cgroup_root) {
+		char buffer[256];
+		sprintf(buffer, "%s/%s", data->common->cgroup_root, filename);
+		int fd = open(buffer, O_RDONLY);
+		if (fd != -1) {
+			int n = read(fd, buffer, sizeof(buffer) - 1);
+			buffer[n] = '\0';
+			data->mem_cgroup = (int)(strtoull(buffer, NULL, 10) >> 10);
+			close(fd);
+			return 0;
+		}
+	}
+	data->mem_cgroup = ESPMEASURE_UNDEFINED;
+	return -1;
+}
+
+
+/**
  * Initializes common memory parameters.
  *
  * The common parameters are assigned during initialization and not
@@ -295,6 +325,15 @@ static int sys_get_cpu_ticks_per_freq(
 }
 
 
+/**
+ * Frees the common system data.
+ * @param common
+ */
+static void sys_data_free_common(sp_measure_sys_common_t* common)
+{
+	if (common->cgroup_root) free(common->cgroup_root);
+	free(common);
+}
 
 /*
  * Public API
@@ -318,20 +357,49 @@ int sp_measure_init_sys_data(
 		new_data->common->ref_count = 1;
 		if ( (resources & SNAPSHOT_SYS_MEM_TOTALS) && sys_init_memory_data(new_data) != 0) rc |= SNAPSHOT_SYS_MEM_TOTALS;
 		if ( (resources & SNAPSHOT_SYS_CPU_MAX_FREQ) && sys_init_cpu_data(new_data) != 0) rc |= SNAPSHOT_SYS_CPU_MAX_FREQ;
+		if ( (resources & SNAPSHOT_SYS_MEM_CGROUPS) ) sp_measure_cgroup_select(new_data, NULL);
 	}
 	return rc;
 }
 
 int sp_measure_free_sys_data(
-		sp_measure_sys_data_t* data
-		)
+        sp_measure_sys_data_t* data
+    )
 {
 	if (data->name) free(data->name);
 	if (data->cpu_freq_ticks) free(data->cpu_freq_ticks);
 	if (--data->common->ref_count == 0) {
-		free(data->common);
+		sys_data_free_common(data->common);
 	}
 	return 0;
+}
+
+
+static const char* cgroup_pattern = NULL;
+static char* cgroup_root = NULL;
+
+static int cgroup_match(const char *fpath, const struct stat *sb, int tflag)
+{
+    if (FTW_D == tflag && strstr(fpath, cgroup_pattern)) {
+		cgroup_root = strdup(fpath);
+		return 1;
+	}
+	return 0; /* To tell ftw() to continue */
+}
+
+
+const char* sp_measure_cgroup_select(sp_measure_sys_data_t* data, const char* name)
+{
+	static const char* root = "/syspart";
+	cgroup_root = NULL;
+
+	if (NULL != name && 0 != *name) {
+		cgroup_pattern = name;
+		ftw(root, cgroup_match, 32);
+	}
+	if (data->common->cgroup_root) free(data->common->cgroup_root);
+	data->common->cgroup_root = cgroup_root ? cgroup_root : strdup(root);
+	return data->common->cgroup_root;
 }
 
 int sp_measure_get_sys_data(
@@ -367,6 +435,9 @@ int sp_measure_get_sys_data(
 			}
 			rc |= SNAPSHOT_SYS_MEM_USAGE;
 		}
+	}
+	if (resources & SNAPSHOT_SYS_MEM_CGROUPS) {
+		if (cgroup_read_int(data, "memory.memsw.usage_in_bytes") != 0) rc |= SNAPSHOT_SYS_MEM_CGROUPS;
 	}
 	if (resources & SNAPSHOT_SYS_MEM_WATERMARK) {
 		int low = 0, high = 0;
@@ -462,6 +533,19 @@ int sp_measure_diff_sys_mem_used(
 		return -EINVAL;
 	}
 	*diff = FIELD_SYS_MEM_USED(data2) - FIELD_SYS_MEM_USED(data1);
+	return 0;
+}
+
+int sp_measure_diff_sys_mem_cgroup(
+		const sp_measure_sys_data_t* data1,
+		const sp_measure_sys_data_t* data2,
+		int* diff
+		)
+{
+	if (data1->common != data2->common) {
+		return -EINVAL;
+	}
+	*diff = FIELD_SYS_MEM_CGROUP(data2) - FIELD_SYS_MEM_CGROUP(data1);
 	return 0;
 }
 

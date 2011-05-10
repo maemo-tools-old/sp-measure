@@ -41,5 +41,4 @@ typedef struct parse_query_t {
 extern char sp_measure_fs_root[];
 extern char* sp_measure_virtual_fs_root;
 
-
 #endif
