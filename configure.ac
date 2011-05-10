@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.13])
-AC_INIT([sp-measure], [1.2], [none])
+AC_INIT([sp-measure], [1.3], [none])
 
 AC_CONFIG_AUX_DIR([aux])
 

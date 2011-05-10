@@ -1,3 +1,9 @@
+sp-measure (1.3) unstable; urgency=low
+
+  * Add support for Cgroups memory usage monitoring - Fixes: NB#253949
+
+ -- Tommi Rantala <ext-tommi.1.rantala@nokia.com>  Tue, 10 May 2011 14:15:48 +0300
+
 sp-measure (1.2.1) unstable; urgency=low
 
   * Packaging fixes.
