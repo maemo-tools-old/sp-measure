@@ -1,0 +1,19 @@
+sp-measure (1.3), 10 May 2011:
+  * Add support for Cgroups memory usage monitoring
+
+sp-measure (1.2.1), 12 Oct 2010:
+  * Packaging fixes.
+
+sp-measure (1.2), 24 Sep 2010:
+  * Fix sp_measure_process.h, so that it can be included in C++ code.
+
+sp-measure (1.1.1), 11 May 2010:
+  * use LGPL as license.  
+
+sp-measure (1.1), 30 Apr 2010:
+  * API change, allow retrieving of part of the data to fail and retrieving
+    of rest of data to continue. 
+  * System memory usage should take swap into account. 
+
+sp-measure (1.0), 12 Apr 2010:
+  * Initial Release. 
