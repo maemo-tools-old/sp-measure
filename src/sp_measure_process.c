@@ -103,26 +103,32 @@ static int file_parse_proc_stat(
 	if (fd != -1) {
 		char* ptr = NULL;
 		unsigned idx = 2;
-		char buffer[512];
+		char buffer[1024];
 		int n = read(fd, buffer, sizeof(buffer) - 1);
-		buffer[n] = '\0';
+		if (n < 0) {
+			rc = -errno;
+		}
+		else {
+			if (n >= sizeof(buffer)) n = sizeof(buffer) - 1;
+			buffer[n] = '\0';
 
-		if ((ptr = strrchr(buffer, ')')) != NULL) {
-			ptr++;
-			while ((ptr = strchr(ptr + 1, ' ')) != NULL) {
-				++idx;
-				if (idx == 13) {
-					int a = 0;
-					if ( (a = sscanf(ptr, "%u", &data->cpu_utime)) != 1) {
+			if ((ptr = strrchr(buffer, ')')) != NULL) {
+				ptr++;
+				while ((ptr = strchr(ptr + 1, ' ')) != NULL) {
+					++idx;
+					if (idx == 13) {
+						int a = 0;
+						if ( (a = sscanf(ptr, "%u", &data->cpu_utime)) != 1) {
+							break;
+						}
+					}
+					else if (idx == 14) {
+						if (sscanf(ptr, "%u", &data->cpu_stime) != 1) {
+							break;
+						}
+						rc = 0;
 						break;
 					}
-				}
-				else if (idx == 14) {
-					if (sscanf(ptr, "%u", &data->cpu_stime) != 1) {
-						break;
-					}
-					rc = 0;
-					break;
 				}
 			}
 		}
@@ -167,25 +173,27 @@ char* get_process_name(int pid)
 	}
 	else {
 		n = read(fd, buffer, sizeof(buffer) - 1);
-		buffer[n] = '\0';
-		char *pstart;
-		char* ptr = strrchr(buffer, '/');
-		if (ptr == NULL) {
-			ptr = buffer;
-			pstart = ptr;
-		}
-		else {
-			pstart = ptr + 1;
-		}
-		while (ptr - buffer < n) {
-			if (*ptr == '\0') {
-				if (*(ptr + 1) == '\0') break;
-				*ptr = ' ';
+		if (n > 0) {
+			buffer[n] = '\0';
+			char *pstart;
+			char* ptr = strrchr(buffer, '/');
+			if (ptr == NULL) {
+				ptr = buffer;
+				pstart = ptr;
 			}
-			ptr++;
+			else {
+				pstart = ptr + 1;
+			}
+			while (ptr - buffer < n) {
+				if (*ptr == '\0') {
+					if (*(ptr + 1) == '\0') break;
+					*ptr = ' ';
+				}
+				ptr++;
+			}
+			close(fd);
+			if (*pstart) proc_name = strdup(pstart);
 		}
-		close(fd);
-		if (*pstart) proc_name = strdup(pstart);
 	}
 	return proc_name;
 }

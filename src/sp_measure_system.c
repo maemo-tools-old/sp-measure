@@ -58,11 +58,12 @@ static int cpu_stats_set_freq_ticks(
 	sp_measure_cpu_freq_ticks_t* state = data->cpu_freq_ticks;
 	if (state) {
 		/* find existing data or free record for the specified frequency */
-		while (state->freq != freq) {
-		if (state - data->cpu_freq_ticks >= data->cpu_freq_ticks_count) {
+		while (true) {
+			if (state - data->cpu_freq_ticks >= data->cpu_freq_ticks_count) {
 				state = NULL;
 				break;
 			}
+			if (state->freq == freq) break;
 			state++;
 		}
 	}
