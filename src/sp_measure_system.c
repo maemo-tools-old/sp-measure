@@ -29,6 +29,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <ftw.h>
+#include <stdint.h>
 
 #include "sp_measure.h"
 #include "measure_utils.h"
@@ -100,18 +101,18 @@ static int cpu_stats_diff_avg_freq(
 		)
 {
 	int i, j;
-	int total_time = 0;
-	int total_freq = 0;
+	uint64_t total_time = 0;
+	uint64_t total_freq = 0;
 	for (i = 0; i < second->cpu_freq_ticks_count; i++) {
-		int ticks = 0;
-		int freq = second->cpu_freq_ticks[i].freq;
+		uint64_t ticks = 0;
+		uint64_t freq = second->cpu_freq_ticks[i].freq;
 		for (j = 0; j < first->cpu_freq_ticks_count; j++) {
 			if (first->cpu_freq_ticks[i].freq == freq) {
 				ticks = first->cpu_freq_ticks[i].ticks;
 				break;
 			}
 		}
-		int diff = second->cpu_freq_ticks[i].ticks - ticks;
+		uint64_t diff = second->cpu_freq_ticks[i].ticks - ticks;
 		total_time += diff;
 		total_freq += freq * diff;
 	}
