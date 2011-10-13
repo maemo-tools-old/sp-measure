@@ -1,3 +1,5 @@
+%define _defaultdocdir %{_datadir}/doc
+
 Name: libsp-measure	
 Version: 1.2.1	
 Release: 1%{?dist}
@@ -29,7 +31,7 @@ rm %{buildroot}/usr/lib/*a
 rm -rf %{buildroot}
 
 %files
-%defattr(-,root,root,-)
+%defattr(644,root,root,-)
 %{_libdir}/libspmeasure.so.*
 %doc COPYING README
 
@@ -46,7 +48,7 @@ Group: Development/Libraries
 libspmeasure headeres and static libraries.
 
 %files devel
-%defattr(-,root,root,-)
+%defattr(644,root,root,-)
 %{_libdir}/libspmeasure.so
 %{_includedir}/*.h
 %{_defaultdocdir}/%{name}-dev/res-monitor.c
