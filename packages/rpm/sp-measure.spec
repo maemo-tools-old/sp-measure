@@ -1,5 +1,3 @@
-%define _defaultdocdir %{_datadir}/doc
-
 Name: libsp-measure	
 Version: 1.2.1	
 Release: 1%{?dist}
