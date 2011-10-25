@@ -1,12 +1,12 @@
-Name: libsp-measure	
-Version: 1.2.1	
+Name: libsp-measure
+Version: 1.3.2
 Release: 1%{?dist}
 Summary: API for measuring system/process resource usage
 Group: Development/Libraries
-License: LGPLv2+	
-URL: http://www.gitorious.org/+maemo-tools-developers/maemo-tools/sp-measure	
+License: LGPLv2+
+URL: http://www.gitorious.org/+maemo-tools-developers/maemo-tools/sp-measure
 Source: sp-measure_%{version}.tar.gz
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: automake, doxygen, libtool
 
 %description
@@ -17,8 +17,8 @@ API for taking system/process resource usage snaphots and calculating difference
 
 %build
 autoreconf -fvi
+
 %configure 
-make %{?_smp_mflags}
 
 %install
 rm -rf %{buildroot}
