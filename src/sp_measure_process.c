@@ -191,9 +191,9 @@ char* get_process_name(int pid)
 				}
 				ptr++;
 			}
-			close(fd);
 			if (*pstart) proc_name = strdup(pstart);
 		}
+		close(fd);
 	}
 	return proc_name;
 }
