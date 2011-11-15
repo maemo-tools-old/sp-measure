@@ -6,7 +6,7 @@ Group: Development/Libraries
 License: LGPLv2+
 URL: http://www.gitorious.org/+maemo-tools-developers/maemo-tools/sp-measure
 Source: sp-measure_%{version}.tar.gz
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-build
 BuildRequires: automake, doxygen, libtool
 
 %description
