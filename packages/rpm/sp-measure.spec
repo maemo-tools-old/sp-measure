@@ -1,5 +1,5 @@
 Name: libsp-measure
-Version: 1.3.2
+Version: 1.3.3
 Release: 1%{?dist}
 Summary: API for measuring system/process resource usage
 Group: Development/Libraries
@@ -29,7 +29,7 @@ rm %{buildroot}/usr/lib/*a
 rm -rf %{buildroot}
 
 %files
-%defattr(644,root,root,-)
+%defattr(-,root,root,-)
 %{_libdir}/libspmeasure.so.*
 %doc COPYING README
 
@@ -41,16 +41,45 @@ rm -rf %{buildroot}
 %package devel
 Summary: Development files for libsmeasure library
 Group: Development/Libraries
+Requires: libsp-measure >= %{version}
 
 %description devel 
-libspmeasure headeres and static libraries.
+Libmeasure development files (headers and static libraries).
 
 %files devel
-%defattr(644,root,root,-)
+%defattr(-,root,root,-)
 %{_libdir}/libspmeasure.so
 %{_includedir}/*.h
 %{_defaultdocdir}/%{name}-dev/res-monitor.c
 %{_mandir}/man3/*
 
 
+%changelog
+* Fri Nov 11 2011 Eero Tamminen <eero.tamminen@nokia.com> 1.3.3
+  * Fix file descriptor leak in get_process_name().
 
+* Fri Sep 09 2011 Eero Tamminen <eero.tamminen@nokia.com> 1.3.2
+  * Fix CPU frequency calculation.
+
+* Fri Aug 05 2011 Eero Tamminen <eero.tamminen@nokia.com> 1.3.1
+  * Fix crashes when /proc/ reading fails.
+
+* Tue May 10 2011 Eero Tamminen <eero.tamminen@nokia.com> 1.3
+  * Add support for Cgroups memory usage monitoring
+
+* Tue Oct 12 2010 Eero Tamminen <eero.tamminen@nokia.com> 1.2.1
+  * Packaging fixes.
+
+* Fri Sep 24 2010 Eero Tamminen <eero.tamminen@nokia.com> 1.2
+  * Fix sp_measure_process.h, so that it can be included in C++ code.
+
+* Tue May 11 2010 Eero Tamminen <eero.tamminen@nokia.com> 1.1.1
+  * use LGPL as license.  
+
+* Fri Apr 30 2010 Eero Tamminen <eero.tamminen@nokia.com> 1.1
+  * API change, allow retrieving of part of the data to fail and retrieving
+    of rest of data to continue. 
+  * System memory usage should take swap into account. 
+
+* Mon Apr 12 2010 Eero Tamminen <eero.tamminen@nokia.com> 1.0
+  * Initial Release. 
