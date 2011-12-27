@@ -41,7 +41,7 @@ rm -rf %{buildroot}
 %package devel
 Summary: Development files for libsmeasure library
 Group: Development/Libraries
-Requires: libsp-measure >= %{version}
+Requires: %{name} = %{version}
 
 %description devel 
 Libmeasure development files (headers and static libraries).
