@@ -11,8 +11,6 @@ AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_SRCDIR([src/sp_measure.h])
 AC_CONFIG_HEADERS([config.h])
 
-AC_PREFIX_DEFAULT(/usr)
-
 # Checks for programs.
 m4_defun([_LT_AC_LANG_F77_CONFIG], [:])
 
