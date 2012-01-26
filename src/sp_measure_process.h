@@ -54,8 +54,8 @@
  *    sp_measure_free_proc_data(&data2);
  *  @endcode
  *
- *  An example of simple monitoring utility is demonstrated in
- *  /usr/share/doc/libsp-measure-dev/examples/res-monitor.c.gz
+ *  res-monitor.c.gz file in the package documentation dir
+ *  is a working source example of the API usage.
  */
 #ifdef __cplusplus
 extern "C" {

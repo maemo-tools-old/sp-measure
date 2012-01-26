@@ -8,6 +8,5 @@ distclean-local:
 	rm -rf aux autom4te.cache
 	
 install-data-local:
-	install -d $(DESTDIR)/usr/share/doc/libsp-measure-dev/
-	install -m 644 examples/res-monitor.c $(DESTDIR)/usr/share/doc/libsp-measure-dev/
-
+	install -d $(DESTDIR)/$(docdir)/libsp-measure-dev/
+	install -m 644 examples/res-monitor.c $(DESTDIR)/$(docdir)/libsp-measure-dev/

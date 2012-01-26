@@ -18,7 +18,7 @@ API for taking system/process resource usage snaphots and calculating difference
 %build
 autoreconf -fvi
 
-%configure 
+%configure --docdir=%{_defaultdocdir}
 
 %install
 rm -rf %{buildroot}
@@ -50,7 +50,6 @@ Libmeasure development files (headers and static libraries).
 %defattr(-,root,root,-)
 %{_libdir}/libspmeasure.so
 %{_includedir}/*.h
-%{_defaultdocdir}/%{name}-dev/
 %{_defaultdocdir}/%{name}-dev/res-monitor.c
 %{_mandir}/man3/*
 
