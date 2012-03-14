@@ -1,3 +1,5 @@
+CFLAGS ?= -O2 -g
+CFLAGS += -Wall
 
 lib_LTLIBRARIES = libspmeasure.la 
 
