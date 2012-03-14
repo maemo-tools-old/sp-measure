@@ -1,7 +1,7 @@
 /*
  * This file is a part of sp-measure library.
  *
- * Copyright (C) 2010 by Nokia Corporation
+ * Copyright (C) 2010-2012 by Nokia Corporation
  *
  * Contact: Eero Tamminen <eero.tamminen@nokia.com>
  *
@@ -63,14 +63,14 @@ static int file_parse_proc_smaps(
 			{"Rss", &data->mem_rss, false},
 			{"Referenced", &data->mem_referenced, false},
 		};
-	for (i = 0; i < sizeof(query) / sizeof(query[0]); i++) {
+	for (i = 0; i < ARRAY_ITEMS(query); i++) {
 		*(query[i].value) = 0;
 	}
 	FILE* fp = fopen(data->common->proc_smaps_path, "r");
 	if (fp) {
 		while (fgets(buffer, sizeof(buffer), fp)) {
 			if (sscanf(buffer, "%[^:]: %d", key, &value) == 2) {
-				for (i = 0; i < sizeof(query) / sizeof(query[0]); i++) {
+				for (i = 0; i < ARRAY_ITEMS(query); i++) {
 					if (!strcmp(query[i].key, key)) {
 						*(query[i].value) += value;
 						break;
@@ -81,7 +81,7 @@ static int file_parse_proc_smaps(
 		fclose(fp);
 		return 0;
 	}
-	for (i = 0; i < sizeof(query) / sizeof(query[0]); i++) {
+	for (i = 0; i < ARRAY_ITEMS(query); i++) {
 		*(query[i].value) = ESPMEASURE_UNDEFINED;
 	}
 	return -1;
@@ -278,9 +278,12 @@ int sp_measure_get_proc_data(
 		data->name = strdup(name);
 		if (data->name == NULL) return -ENOMEM;
 	}
-	if ( (resources & SNAPSHOT_PROC_MEM_USAGE) && file_parse_proc_smaps(data) != 0) rc |= SNAPSHOT_PROC_MEM_USAGE;
-	if ( (resources & SNAPSHOT_PROC_CPU_USAGE) && file_parse_proc_stat(data) != 0) rc |= SNAPSHOT_PROC_CPU_USAGE;
-
+	if ( (resources & SNAPSHOT_PROC_MEM_USAGE) && file_parse_proc_smaps(data) != 0) {
+		rc |= SNAPSHOT_PROC_MEM_USAGE;
+	}
+	if ( (resources & SNAPSHOT_PROC_CPU_USAGE) && file_parse_proc_stat(data) != 0) {
+		rc |= SNAPSHOT_PROC_CPU_USAGE;
+	}
 	return rc;
 }
 

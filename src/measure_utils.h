@@ -1,7 +1,7 @@
 /*
  * This file is a part of sp-measure library.
  *
- * Copyright (C) 2010 by Nokia Corporation
+ * Copyright (C) 2010-2012 by Nokia Corporation
  *
  * Contact: Eero Tamminen <eero.tamminen@nokia.com>
  *
@@ -23,6 +23,7 @@
 #ifndef MEASURE_UTILS_H
 #define MEASURE_UTILS_H
 
+#define ARRAY_ITEMS(arr) (sizeof(query)/sizeof(query[0]))
 
 /**
  * Key/value pairs for file parsing.

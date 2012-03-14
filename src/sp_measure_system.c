@@ -1,7 +1,7 @@
 /*
  * This file is a part of sp-measure library.
  *
- * Copyright (C) 2010 by Nokia Corporation
+ * Copyright (C) 2010-2012 by Nokia Corporation
  *
  * Contact: Eero Tamminen <eero.tamminen@nokia.com>
  *
@@ -229,10 +229,10 @@ static int sys_init_memory_data(
 		{ "SwapTotal", &data->common->mem_swap, false },
 	};
 
-	if (file_parse_proc_meminfo(query, sizeof(query)/sizeof(query[0]))
-			!= sizeof(query)/sizeof(query[0])) {
+	if (file_parse_proc_meminfo(query, ARRAY_ITEMS(query))
+			!= ARRAY_ITEMS(query)) {
 		int i;
-		for (i = 0; i < sizeof(query)/sizeof(query[0]); i++) {
+		for (i = 0; i < ARRAY_ITEMS(query); i++) {
 			*query[i].value = ESPMEASURE_UNDEFINED;
 		}
 		return -1;
@@ -429,27 +429,36 @@ int sp_measure_get_sys_data(
 			{ "SwapCached", &data->mem_swap_cached, false },
 			{ "SwapFree", &data->mem_swap_free, false },
 		};
-		if (file_parse_proc_meminfo(query, sizeof(query)/sizeof(query[0]))
-				!= sizeof(query)/sizeof(query[0])) {
+		if (file_parse_proc_meminfo(query, ARRAY_ITEMS(query))
+				!= ARRAY_ITEMS(query)) {
 			int i;
-			for (i = 0; i < sizeof(query)/sizeof(query[0]); i++) {
+			for (i = 0; i < ARRAY_ITEMS(query); i++) {
 				*query[i].value = ESPMEASURE_UNDEFINED;
 			}
 			rc |= SNAPSHOT_SYS_MEM_USAGE;
 		}
 	}
 	if (resources & SNAPSHOT_SYS_MEM_CGROUPS) {
-		if (cgroup_read_int(data, "memory.memsw.usage_in_bytes") != 0) rc |= SNAPSHOT_SYS_MEM_CGROUPS;
+		if (cgroup_read_int(data, "memory.memsw.usage_in_bytes") != 0) {
+			rc |= SNAPSHOT_SYS_MEM_CGROUPS;
+		}
 	}
 	if (resources & SNAPSHOT_SYS_MEM_WATERMARK) {
 		int low = 0, high = 0;
-		if (file_read_int("/sys/kernel/low_watermark", &low) != 0) rc |= SNAPSHOT_SYS_MEM_WATERMARK;
-		if (file_read_int("/sys/kernel/high_watermark", &high) != 0) rc |= SNAPSHOT_SYS_MEM_WATERMARK;
+		if (file_read_int("/sys/kernel/low_watermark", &low) != 0) {
+			rc |= SNAPSHOT_SYS_MEM_WATERMARK;
+		}
+		if (file_read_int("/sys/kernel/high_watermark", &high) != 0) {
+			rc |= SNAPSHOT_SYS_MEM_WATERMARK;
+		}
 		data->mem_watermark = low | (high << 1);
 	}
-	if ( (resources & SNAPSHOT_SYS_CPU_USAGE) && sys_get_cpu_ticks_total(data) != 0) rc |= SNAPSHOT_SYS_CPU_USAGE;
-	if ( (resources & SNAPSHOT_SYS_CPU_FREQ) && sys_get_cpu_ticks_per_freq(data) != 0) rc |= SNAPSHOT_SYS_CPU_FREQ;
-
+	if ( (resources & SNAPSHOT_SYS_CPU_USAGE) && sys_get_cpu_ticks_total(data) != 0) {
+		rc |= SNAPSHOT_SYS_CPU_USAGE;
+	}
+	if ( (resources & SNAPSHOT_SYS_CPU_FREQ) && sys_get_cpu_ticks_per_freq(data) != 0) {
+		rc |= SNAPSHOT_SYS_CPU_FREQ;
+	}
 	return rc;
 }
 

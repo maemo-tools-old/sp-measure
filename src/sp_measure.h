@@ -1,7 +1,7 @@
 /*
  * This file is a part of sp-measure library.
  *
- * Copyright (C) 2010 by Nokia Corporation
+ * Copyright (C) 2010-2012 by Nokia Corporation
  *
  * Contact: Eero Tamminen <eero.tamminen@nokia.com>
  *
@@ -26,7 +26,7 @@
 #include <stdio.h>
 
 /**
- * System resource identifiers.
+ * System resource identifiers and their generic groupings.
  */
 typedef enum {
 	SNAPSHOT_SYS_TIMESTAMP       = 1 << 0,
