@@ -43,7 +43,7 @@
  *
  * The clean and dirty memory is calculated by simply parsing
  * /proc/<pdi>/smaps file.
- * @param stats[in, out]   in  - the smaps file pointer.
+ * @param[in,out] stats    in  - the smaps file pointer.
  *                         out - memory statistics.
  * @return                 0 for success.
  */
@@ -91,7 +91,7 @@ static int file_parse_proc_smaps(
 /**
  * Get cpu statistics from /proc/<pid>/stat file.
  *
- * @return stats[in, out]   in  - the /proc/<pid>/stat file pointer.
+ * @return[in,out] stats    in  - the /proc/<pid>/stat file pointer.
  *                          out - the cpu statistics.
  * @return                  0 for success.
  */
