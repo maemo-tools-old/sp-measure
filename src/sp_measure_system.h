@@ -322,7 +322,7 @@ int sp_measure_diff_sys_mem_cgroup(
  * value.
  * This function can be used for getting measurements out of saved
  * /proc/ & /sys/ files, and for testing purposes.
- * @param path[in]   the new root of proc file system. Use NULL to
+ * @param[in] path   the new root of proc file system. Use NULL to
  *                   reset to the default value /proc.
  * @return           0 for success.
  */
