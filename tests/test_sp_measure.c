@@ -1,7 +1,7 @@
 /*
  * This file is a spart of sp-measure library.
  *
- * Copyright (C) 2010 by Nokia Corporation
+ * Copyright (C) 2010,2012 by Nokia Corporation
  *
  * Contact: Eero Tamminen <eero.tamminen@nokia.com>
  *
@@ -35,6 +35,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <sp_measure.h>
 

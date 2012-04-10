@@ -1,7 +1,7 @@
 /*
  * This file is a part of sp-measure library.
  *
- * Copyright (C) 2010 by Nokia Corporation
+ * Copyright (C) 2010-2012 by Nokia Corporation
  *
  * Contact: Eero Tamminen <eero.tamminen@nokia.com>
  *
@@ -313,6 +313,20 @@ int sp_measure_diff_sys_mem_cgroup(
 		const sp_measure_sys_data_t* data2,
 		int* diff
 		);
+
+/**
+ * Sets root of the /proc file system.
+ *
+ * This function allows to override the default proc file system root
+ * /proc with a custom value.  Use NULL path to reset it to the default
+ * value.
+ * This function can be used for getting measurements out of saved
+ * /proc/ & /sys/ files, and for testing purposes.
+ * @param path[in]   the new root of proc file system. Use NULL to
+ *                   reset to the default value /proc.
+ * @return           0 for success.
+ */
+extern int sp_measure_set_fs_root(const char* path);
 
 
 /*

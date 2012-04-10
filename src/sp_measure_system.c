@@ -561,22 +561,14 @@ int sp_measure_diff_sys_mem_cgroup(
 }
 
 
-/**
- * Sets root of the /proc file system.
- *
- * This function allows to override the default proc file system root
- * /proc with a custom value. Use NULL path to reset it to the default
- * value.
- * This function is only used for testing purposes - that's why it has
- * not been included into sp_measure* headers.
- * @param path[in]   the new root of proc file system. Use NULL to
- *                   reset to the default value /proc.
- * @return
- */
-int sp_measure_set_fs_root(const char* path) {
+int sp_measure_set_fs_root(const char* path)
+{
 	if (sp_measure_virtual_fs_root != sp_measure_fs_root) {
 		free(sp_measure_virtual_fs_root);
 	}
 	sp_measure_virtual_fs_root = path ? strdup(path) : sp_measure_fs_root;
-	return 0;
+	if (sp_measure_virtual_fs_root) {
+		return 0;
+	}
+	return -1;
 }
