@@ -103,9 +103,14 @@ void check_system_api()
 
 	int diff;
 
-	/* data1 and data3 does not share the same common data (they  wer
-	 * initalized separately. Comparison operations for such snapshots
-	 * should fail */
+	/* this isn't actually a diff, but average frequency between snapshots */
+	TEST(sp_measure_diff_sys_cpu_avg_freq(&data1, &data2, &diff) == 0);
+	TEST(diff == 839559, "\tsp_measure_diff_sys_cpu_avg_freq: diff=%d\n", diff);
+
+	/* data1 and data3 does not share the same common data (they were
+	 * initialized separately. Comparison operations for such snapshots
+	 * should fail
+	 */
 	TEST(sp_measure_diff_sys_cpu_ticks(&data1, &data3, &diff) < 0);
 	TEST(sp_measure_diff_sys_cpu_usage(&data1, &data3, &diff) < 0);
 	TEST(sp_measure_diff_sys_cpu_avg_freq(&data1, &data3, &diff) < 0);
@@ -117,9 +122,6 @@ void check_system_api()
 
 	TEST(sp_measure_diff_sys_cpu_usage(&data1, &data2, &diff) == 0);
 	TEST(diff == 832, "\tsp_measure_diff_sys_cpu_usage: diff=%d\n", diff);
-
-	TEST(sp_measure_diff_sys_cpu_avg_freq(&data1, &data2, &diff) == 0);
-	TEST(diff == 7577, "\tsp_measure_diff_sys_cpu_avg_freq: diff=%d\n", diff);
 
 	TEST(sp_measure_diff_sys_mem_used(&data1, &data2, &diff) == 0);
 	TEST(diff == 824, "\tsp_measure_diff_sys_mem_used: diff=%d\n", diff);
