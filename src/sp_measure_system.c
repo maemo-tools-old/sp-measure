@@ -30,6 +30,7 @@
 #include <sys/time.h>
 #include <ftw.h>
 #include <stdint.h>
+#include <limits.h>
 
 #include "sp_measure.h"
 #include "measure_utils.h"
@@ -134,10 +135,9 @@ static int file_parse_proc_meminfo(
 		)
 {
 	int nscanned = 0, value = 0, i;
-	char buffer[128], key[128];
-	char filename[256];
-	sprintf(filename, "%s/proc/meminfo", sp_measure_virtual_fs_root);
-	FILE* fp = fopen(filename, "r");
+	char key[128], buffer[PATH_MAX];
+	snprintf(buffer, sizeof(buffer), "%s/proc/meminfo", sp_measure_virtual_fs_root);
+	FILE* fp = fopen(buffer, "r");
 	if (fp) {
 		while (fgets(buffer, sizeof(buffer), fp) && nscanned < length) {
 			if (sscanf(buffer, "%[^:]: %d", key, &value) == 2) {
@@ -170,15 +170,17 @@ static int file_read_int(
 		int* value
 		)
 {
-	char buffer[256];
-	sprintf(buffer, "%s%s", sp_measure_virtual_fs_root, filename);
+	char buffer[PATH_MAX];
+	snprintf(buffer, sizeof(buffer), "%s%s", sp_measure_virtual_fs_root, filename);
 	int fd = open(buffer, O_RDONLY);
 	if (fd != -1) {
 		int n = read(fd, buffer, sizeof(buffer) - 1);
-		buffer[n] = '\0';
-		*value = atoi(buffer);
 		close(fd);
-		return 0;
+		if (n > 0) {
+			buffer[n] = '\0';
+			*value = atoi(buffer);
+			return 0;
+		}
 	}
 	return -1;
 }
@@ -196,15 +198,17 @@ static int cgroup_read_int(
 		)
 {
 	if (data->common->cgroup_root) {
-		char buffer[256];
-		sprintf(buffer, "%s/%s", data->common->cgroup_root, filename);
+		char buffer[PATH_MAX];
+		ssprintf(buffer, sizeof(buffer), "%s/%s", data->common->cgroup_root, filename);
 		int fd = open(buffer, O_RDONLY);
 		if (fd != -1) {
 			int n = read(fd, buffer, sizeof(buffer) - 1);
-			buffer[n] = '\0';
-			data->mem_cgroup = (int)(strtoull(buffer, NULL, 10) >> 10);
 			close(fd);
-			return 0;
+			if (n > 0) {
+				buffer[n] = '\0';
+				data->mem_cgroup = (int)(strtoull(buffer, NULL, 10) >> 10);
+				return 0;
+			}
 		}
 	}
 	data->mem_cgroup = ESPMEASURE_UNDEFINED;
@@ -270,8 +274,8 @@ static int sys_get_cpu_ticks_total(
 		sp_measure_sys_data_t* stats
 		)
 {
-	char buffer[512];
-	sprintf(buffer, "%s/proc/stat", sp_measure_virtual_fs_root);
+	char buffer[PATH_MAX];
+	snprintf(buffer, sizeof(buffer), "%s/proc/stat", sp_measure_virtual_fs_root);
 	FILE* fp = fopen(buffer, "r");
 	if (fp) {
 		stats->cpu_ticks_total = 0;
@@ -310,8 +314,8 @@ static int sys_get_cpu_ticks_per_freq(
 		sp_measure_sys_data_t* stats
 		)
 {
-	char buffer[512];
-	sprintf(buffer, "%s/sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state", sp_measure_virtual_fs_root);
+	char buffer[PATH_MAX];
+	snprintf(buffer, sizeof(buffer), "%s/sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state", sp_measure_virtual_fs_root);
 	FILE* fp = fopen(buffer, "r");
 	if (fp) {
 		int freq, ticks;

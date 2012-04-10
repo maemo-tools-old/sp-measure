@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <limits.h>
 
 #include "sp_measure.h"
 #include "measure_utils.h"
@@ -152,13 +153,13 @@ static int file_parse_proc_stat(
 char* get_process_name(int pid)
 {
 	int fd, n;
-	char buffer[512];
 	char* proc_name = NULL;
+	char buffer[PATH_MAX];
 
-	sprintf(buffer, "%s/proc/%d/cmdline", sp_measure_virtual_fs_root, pid);
+	snprintf(buffer, sizeof(buffer), "%s/proc/%d/cmdline", sp_measure_virtual_fs_root, pid);
 	fd = open(buffer, O_RDONLY);
 	if (fd == -1) {
-		sprintf(buffer, "%s/proc/%d/status", sp_measure_virtual_fs_root, pid);
+		snprintf(buffer, sizeof(buffer), "%s/proc/%d/status", sp_measure_virtual_fs_root, pid);
 		FILE* fp = fopen(buffer, "r");
 		if (fp) {
 			char name[256];
@@ -214,7 +215,7 @@ int sp_measure_init_proc_data(
 	}
 	else
 	{
-		char buffer[256];
+		char buffer[PATH_MAX];
 		new_data->common = (sp_measure_proc_common_t*)malloc(sizeof(sp_measure_proc_common_t));
 		if (new_data->common == NULL) return -ENOMEM;
 
@@ -222,11 +223,11 @@ int sp_measure_init_proc_data(
 		new_data->common->ref_count = 1;
 
 		/* open data files */
-		sprintf(buffer, "%s/proc/%d/smaps", sp_measure_virtual_fs_root, pid);
+		snprintf(buffer, sizeof(buffer), "%s/proc/%d/smaps", sp_measure_virtual_fs_root, pid);
 		new_data->common->proc_smaps_path = strdup(buffer);
 		if (new_data->common->proc_smaps_path == NULL) return -ENOMEM;
 
-		sprintf(buffer, "%s/proc/%d/stat", sp_measure_virtual_fs_root, pid);
+		snprintf(buffer, sizeof(buffer), "%s/proc/%d/stat", sp_measure_virtual_fs_root, pid);
 		new_data->common->proc_stat_path = strdup(buffer);
 		if (new_data->common->proc_stat_path == NULL) return -ENOMEM;
 
