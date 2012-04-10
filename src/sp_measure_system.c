@@ -199,7 +199,7 @@ static int cgroup_read_int(
 {
 	if (data->common->cgroup_root) {
 		char buffer[PATH_MAX];
-		ssprintf(buffer, sizeof(buffer), "%s/%s", data->common->cgroup_root, filename);
+		snprintf(buffer, sizeof(buffer), "%s/%s", data->common->cgroup_root, filename);
 		int fd = open(buffer, O_RDONLY);
 		if (fd != -1) {
 			int n = read(fd, buffer, sizeof(buffer) - 1);
