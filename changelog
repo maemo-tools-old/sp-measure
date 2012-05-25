@@ -1,3 +1,10 @@
+sp-measure (1.3.5), 25 May 2012:
+  * Disable obsolete Maemo 4 memory watermarks by default
+    to avoid run-time warning.
+  * Speed up SMAPS data parsing by tens of percents.
+  * Document & comment typo and compiler warning fixes.
+  * Fix test program CPU freq value calculation.
+
 sp-measure (1.3.4), 23 Mar 2012:
   * Have default CFLAGS, don't default to /usr, allow doc directory
     install path to be configured.
