@@ -42,7 +42,7 @@
  * Calculates process clean and dirty memory.
  *
  * The clean and dirty memory is calculated by simply parsing
- * /proc/<pdi>/smaps file.
+ * /proc/<pid>/smaps file.
  * @param[in,out] stats    in  - the smaps file pointer.
  *                         out - memory statistics.
  * @return                 0 for success.
