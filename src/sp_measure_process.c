@@ -65,28 +65,28 @@ static int file_parse_proc_smaps(
 			{"Rss", &data->mem_rss, false},
 			{"Referenced", &data->mem_referenced, false},
 		};
+	FILE* fp = fopen(data->common->proc_smaps_path, "r");
+	if (!fp) {
+		for (i = 0; i < ARRAY_ITEMS(query); i++) {
+			*(query[i].value) = ESPMEASURE_UNDEFINED;
+		}
+		return -1;
+	}
 	for (i = 0; i < ARRAY_ITEMS(query); i++) {
 		*(query[i].value) = 0;
 	}
-	FILE* fp = fopen(data->common->proc_smaps_path, "r");
-	if (fp) {
-		while (fgets(buffer, sizeof(buffer), fp)) {
-			if (sscanf(buffer, "%[^:]: %d", key, &value) == 2) {
-				for (i = 0; i < ARRAY_ITEMS(query); i++) {
-					if (!strcmp(query[i].key, key)) {
-						*(query[i].value) += value;
-						break;
-					}
+	while (fgets(buffer, sizeof(buffer), fp)) {
+		if (sscanf(buffer, "%[^:]: %d", key, &value) == 2) {
+			for (i = 0; i < ARRAY_ITEMS(query); i++) {
+				if (!strcmp(query[i].key, key)) {
+					*(query[i].value) += value;
+					break;
 				}
 			}
 		}
-		fclose(fp);
-		return 0;
 	}
-	for (i = 0; i < ARRAY_ITEMS(query); i++) {
-		*(query[i].value) = ESPMEASURE_UNDEFINED;
-	}
-	return -1;
+	fclose(fp);
+	return 0;
 }
 
 /**
