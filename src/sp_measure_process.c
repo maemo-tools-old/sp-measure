@@ -52,7 +52,8 @@ static int file_parse_proc_smaps(
 		)
 {
 	char buffer[128], key[128];
-	int value, i;
+	int value;
+	unsigned i;
 	parse_query_t query[] = {
 			{"Private_Clean", &data->mem_private_clean, false},
 			{"Private_Dirty", &data->mem_private_dirty, false},
