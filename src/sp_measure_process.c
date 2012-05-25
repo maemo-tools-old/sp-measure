@@ -51,8 +51,7 @@ static int file_parse_proc_smaps(
 		sp_measure_proc_data_t* data
 		)
 {
-	char buffer[128], key[128];
-	int value;
+	char buffer[128];
 	unsigned i;
 	parse_query_t query[] = {
 			{"Private_Clean", &data->mem_private_clean, false},
@@ -76,13 +75,39 @@ static int file_parse_proc_smaps(
 		*(query[i].value) = 0;
 	}
 	while (fgets(buffer, sizeof(buffer), fp)) {
-		if (sscanf(buffer, "%[^:]: %d", key, &value) == 2) {
-			for (i = 0; i < ARRAY_ITEMS(query); i++) {
-				if (!strcmp(query[i].key, key)) {
-					*(query[i].value) += value;
-					break;
-				}
-			}
+		if (buffer[0] == 0)
+			continue;
+		/* We are only interested in /proc/pid/smaps lines that start
+		 * with one of these letters.
+		 */
+		if (!(buffer[0] == 'P' ||
+		      buffer[0] == 'R' ||
+		      buffer[0] == 'S'))
+			continue;
+		char* colon = strchr(buffer, ':');
+		if (colon == NULL || colon[1] == 0 || buffer == colon)
+			continue;
+		*colon = 0;
+		for (i = 0; i < ARRAY_ITEMS(query); i++) {
+			if (strcmp(query[i].key, buffer) != 0)
+				continue;
+			char* start = &colon[1];
+			char* end;
+			int value;
+			while (*start && *start == ' ')
+				++start;
+			/* Checking the end would not be strictly required with atoi(). */
+			end = start;
+			while (*end && *end >= '0' && *end <= '9')
+				++end;
+			if (*end != ' ')
+				break;
+			*end = 0;
+			value = atoi(start);
+			if (value <= 0)
+				break;
+			*(query[i].value) += value;
+			break;
 		}
 	}
 	fclose(fp);
