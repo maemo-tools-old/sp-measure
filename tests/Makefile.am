@@ -1,6 +1,6 @@
 CFLAGS = -I../src -g
 LDFLAGS = -L../src/.libs/
-LIBS = ../src/.libs/libspmeasure.a
+LDADD = ../src/.libs/libspmeasure.a
 
 TESTS = test_sp_measure
 check_PROGRAMS = test_sp_measure
